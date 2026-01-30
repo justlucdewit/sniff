@@ -1,5 +1,8 @@
 import fs from 'fs'
 import { create } from 'zustand';
+import path from "path"
+
+type FileType = "dir" | "file" | "unknown";
 
 const determineContentType = (file: string) => {
     if (fs.lstatSync(file).isFile()) {
@@ -45,17 +48,52 @@ export const useFileStore = create((set) => ({
         cursorIndex: 0
     })),
 
-    loadFiles: () => set((state: any) => {
-        const content = fs.readdirSync(state.directory);
+    loadFiles: () => {
+        const directory = (useFileStore.getState() as any).directory
+        
+        // Safely read directory
+        const content = fs.readdirSync(directory);
 
-        let indx = 0;
+        // Strict priority mapping
+        const typePriority: Record<FileType, number> = {
+            "dir": 0,
+            "file": 1,
+            "unknown": 2
+        };
 
-        return {
-            files: content.map(c => ({
-                name: c,
-                type: determineContentType(state.directory + "/" + c),
-                indx: indx++
-            }))
-        }
-    }),
+        const sortedFiles = content
+        .map((name) => {
+            const fullPath = path.join(directory, name);
+            let type: FileType = "unknown";
+            
+            const stats = fs.lstatSync(fullPath);
+            if (stats.isDirectory()) {
+                type = "dir";
+            } else if (stats.isFile()) {
+                type = "file";
+            }
+
+            return { name, type }
+        })
+        
+        // Sort: Directories first, then Files, then alphabetically
+        .sort((a, b) => {
+            if (typePriority[a.type] !== typePriority[b.type]) {
+                return typePriority[a.type] - typePriority[b.type];
+            }
+
+            return a.name.localeCompare(b.name, undefined, { 
+                numeric: true, 
+                sensitivity: 'base' 
+            });
+        })
+
+        // Assign the visible index after sorting
+        .map((file, index) => ({
+            ...file,
+            indx: index
+        }));
+
+        set({ files: sortedFiles });
+    },
 }));

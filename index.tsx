@@ -66,6 +66,10 @@ keyHandler.on("keypress", (key: KeyEvent) => {
 
         exec(`${settings.editor} ${new_dir}`);
     }
+
+    if (key.name == "t") {
+        renderer.root.getRenderable("inputbar")?.focus()
+    }
 });
 
 (useFileStore.getState() as any).setDirectory(process.cwd());
