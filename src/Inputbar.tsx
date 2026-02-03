@@ -1,7 +1,11 @@
+import settings from "./settings"
+
 export function Inputbar() {
     return (
-        <input id="inputbar" placeholder="This is a test...">
+        <box visible={false} borderColor={settings.border.color.focus} borderStyle="rounded" height={3}>
+            <input id="inputbar" placeholder="This is a test...">
 
-        </input>
+            </input>
+        </box>
     );
 }

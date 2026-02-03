@@ -12,6 +12,10 @@ createRoot(renderer).render(<App />)
 const keyHandler = renderer.keyInput;
 
 keyHandler.on("keypress", (key: KeyEvent) => {
+    const inputBar = renderer.root.findDescendantById("inputbar");
+    const fileList = renderer.root.findDescendantById("files");
+
+    // Global keybinds
     if (key.name == "q") {
         renderer.destroy()
     }
@@ -20,58 +24,63 @@ keyHandler.on("keypress", (key: KeyEvent) => {
         renderer.toggleDebugOverlay()
     }
 
-    // Moving selection down
-    if (key.name == "j") {
-        (useFileStore.getState() as any).moveDown();
+    if (key.name == "tab") {
+        // if (fileList?.focused)
+        //     inputBar?.focus();
+        // else if (inputBar?.focused)
+        //     fileList?.focus();
     }
 
-    // Moving selection up
-    if (key.name == "k") {
-        (useFileStore.getState() as any).moveUp();
-    }
+    // File list keybinds
+    if (fileList?.focused) {
+        // Moving selection down
+        if (key.name == "j") {
+            (useFileStore.getState() as any).moveDown();
+        }
+    
+        // Moving selection up
+        if (key.name == "k") {
+            (useFileStore.getState() as any).moveUp();
+        }
 
-    // renderer.setTerminalTitle(new_dir);
+        if (key.name == "return") {
+            // Open and load directory
+            const dir = (useFileStore.getState() as any).directory ?? "";
+            const sel = (useFileStore.getState() as any).getSelectedItem();
+            const new_dir = (dir + "/" + sel.name).replaceAll("//", "/");
+    
+            // Open if directory
+            if (fs.lstatSync(new_dir).isDirectory()) {
+                (useFileStore.getState() as any).setDirectory(new_dir);
+                (useFileStore.getState() as any).loadFiles();
+                (useFileStore.getState() as any).resetSelectedItem();
+            }
+        }
 
-    // Return key enters a directory
-    if (key.name == "return") {
-        // Open and load directory
-        const dir = (useFileStore.getState() as any).directory ?? "";
-        const sel = (useFileStore.getState() as any).getSelectedItem();
-        const new_dir = (dir + "/" + sel.name).replaceAll("//", "/");
-
-        // Open if directory
-        if (fs.lstatSync(new_dir).isDirectory()) {
-            (useFileStore.getState() as any).setDirectory(new_dir);
+        if (key.name == "backspace") {
+            const dir = (useFileStore.getState() as any).directory;
+            let par_dir = dir.split("/").slice(0, -1).join("/");
+            if (par_dir.length == 0)
+                par_dir = "/";
+            (useFileStore.getState() as any).setDirectory(par_dir);
             (useFileStore.getState() as any).loadFiles();
             (useFileStore.getState() as any).resetSelectedItem();
         }
+
+        if (key.name == "e") {
+            const dir = (useFileStore.getState() as any).directory ?? "";
+            const sel = (useFileStore.getState() as any).getSelectedItem();
+            const new_dir = (dir + "/" + sel.name).replaceAll("//", "/");
+    
+            exec(`${settings.editor} ${new_dir}`);
+        }
     }
 
-    // Backspace key goes back one directory
-    if (key.name == "backspace") {
-        const dir = (useFileStore.getState() as any).directory;
-        let par_dir = dir.split("/").slice(0, -1).join("/");
-        if (par_dir.length == 0)
-            par_dir = "/";
-        (useFileStore.getState() as any).setDirectory(par_dir);
-        (useFileStore.getState() as any).loadFiles();
-        (useFileStore.getState() as any).resetSelectedItem();
-    }
+    // Inputbar keybinds
+    if (inputBar?.focused) {
 
-    // e to edit in editor
-    if (key.name == "e") {
-        const dir = (useFileStore.getState() as any).directory ?? "";
-        const sel = (useFileStore.getState() as any).getSelectedItem();
-        const new_dir = (dir + "/" + sel.name).replaceAll("//", "/");
-
-        exec(`${settings.editor} ${new_dir}`);
-    }
-
-    if (key.name == "t") {
-        renderer.root.getRenderable("inputbar")?.focus()
     }
 });
 
 (useFileStore.getState() as any).setDirectory(process.cwd());
 (useFileStore.getState() as any).loadFiles();
-renderer.root.getRenderable("files")?.focus()

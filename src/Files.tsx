@@ -23,7 +23,7 @@ export function Files() {
     }, [cursorIndex]);
 
     return (
-        <scrollbox ref={scrollRef} title={directory} id='files' scrollY borderColor={settings.border.color.focus} borderStyle="rounded" flexDirection="row" height="100%" width="100%" paddingRight={0}>
+        <scrollbox focused={true} ref={scrollRef} title={directory} id='files' scrollY borderColor={settings.border.color.dimmed} focusedBorderColor={settings.border.color.focus} borderStyle="rounded" flexDirection="row" height="100%" width="100%" paddingRight={0}>
             {files.map((file, idx) => (
                 <text fg={file.indx == cursorIndex ? settings.border.color.bright : settings.border.color.dimmed}>
                     {type2iconMap[file.type]} {file.name}
