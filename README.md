@@ -22,6 +22,7 @@ This application uses the following keys:
 | backspace | Go to parent directory
 | e | Open in editor
 | q | Quit
+| r | rename item
 
 In the future, these will be added:
 | Key | Description |
@@ -36,5 +37,4 @@ In the future, these will be added:
 | f | Favorite current folder
 | c | Copy item
 | p | Paste item
-| r | rename item
 | delete | delete item

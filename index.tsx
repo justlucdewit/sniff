@@ -1,9 +1,10 @@
-import { createCliRenderer, type KeyEvent } from "@opentui/core"
+import { createCliRenderer, InputRenderable, type KeyEvent } from "@opentui/core"
 import { createRoot } from "@opentui/react"
-import { useFileStore } from "./src/store"
+import { useFileStore, useInputStore } from "./src/store"
 import { exec } from 'child_process'
 import { App } from './src/App'
 import settings from './src/settings'
+import { InputRenderableEvents } from "@opentui/core"
 import fs from "fs"
 
 const renderer = await createCliRenderer();
@@ -15,15 +16,6 @@ keyHandler.on("keypress", (key: KeyEvent) => {
     const inputBar = renderer.root.findDescendantById("inputbar");
     const fileList = renderer.root.findDescendantById("files");
 
-    // Global keybinds
-    if (key.name == "q") {
-        renderer.destroy()
-    }
-
-    if (key.name == "?") {
-        renderer.toggleDebugOverlay()
-    }
-
     if (key.name == "tab") {
         // if (fileList?.focused)
         //     inputBar?.focus();
@@ -33,6 +25,11 @@ keyHandler.on("keypress", (key: KeyEvent) => {
 
     // File list keybinds
     if (fileList?.focused) {
+        // Quit app
+        if (key.name == "q") {
+            renderer.destroy()
+        }
+
         // Moving selection down
         if (key.name == "j") {
             (useFileStore.getState() as any).moveDown();
@@ -43,6 +40,7 @@ keyHandler.on("keypress", (key: KeyEvent) => {
             (useFileStore.getState() as any).moveUp();
         }
 
+        // Enter a directory
         if (key.name == "return") {
             // Open and load directory
             const dir = (useFileStore.getState() as any).directory ?? "";
@@ -57,6 +55,7 @@ keyHandler.on("keypress", (key: KeyEvent) => {
             }
         }
 
+        // Go up a directory
         if (key.name == "backspace") {
             const dir = (useFileStore.getState() as any).directory;
             let par_dir = dir.split("/").slice(0, -1).join("/");
@@ -67,6 +66,7 @@ keyHandler.on("keypress", (key: KeyEvent) => {
             (useFileStore.getState() as any).resetSelectedItem();
         }
 
+        // Open in editor
         if (key.name == "e") {
             const dir = (useFileStore.getState() as any).directory ?? "";
             const sel = (useFileStore.getState() as any).getSelectedItem();
@@ -74,11 +74,21 @@ keyHandler.on("keypress", (key: KeyEvent) => {
     
             exec(`${settings.editor} ${new_dir}`);
         }
-    }
 
-    // Inputbar keybinds
-    if (inputBar?.focused) {
-
+        // Rename file
+        if (key.name == "r" && inputBar) {
+            (useInputStore.getState() as any).setVisible(true);
+            const oldName = (useFileStore.getState() as any).getSelectedItem();
+            (useInputStore.getState() as any).setValue(oldName.name);
+            inputBar.focus();
+            inputBar.once(InputRenderableEvents.ENTER, (newName: string) => {
+                (useInputStore.getState() as any).setVisible(false);
+                fileList.focus();
+                const dir = (useFileStore.getState() as any).directory;
+                fs.renameSync(`${dir}/${oldName.name}`, `${dir}/${newName}`);
+                (useFileStore.getState() as any).loadFiles();
+            });
+        }
     }
 });
 

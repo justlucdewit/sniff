@@ -18,6 +18,13 @@ const determineContentType = (file: string) => {
     }
 }
 
+export const useInputStore = create((set) => ({
+    visible: false,
+    value: '',
+    setVisible: (visible: boolean) => set({ visible: visible }),
+    setValue: (value: string) => set({ value: value }),
+}))
+
 export const useFileStore = create((set) => ({
     cursorIndex: 0,
     directory: "/",
@@ -38,6 +45,7 @@ export const useFileStore = create((set) => ({
     })),
 
     getSelectedItem: (dir: string) => {
+        (useFileStore.getState() as any).loadFiles();
         const files = (useFileStore.getState() as any).files
         const i = (useFileStore.getState() as any).cursorIndex
 
