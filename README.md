@@ -1,4 +1,5 @@
-# File Explorer
+# Sniff
+Simple Navigation Interface for Finding Files
 
 ## Installation
 ```bash
