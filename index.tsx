@@ -103,6 +103,13 @@ keyHandler.on("keypress", (key: KeyEvent) => {
                 (useFileStore.getState() as any).loadFiles();
             });
         }
+
+        // Delete file
+        if (key.name == "delete" || key.name == "d") {
+            const target = (useFileStore.getState() as any).getSelectedItem();
+            fs.rmSync(target.name);
+            (useFileStore.getState() as any).loadFiles();
+        }
     }
 });
 
