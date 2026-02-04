@@ -3,9 +3,9 @@
 + Only enter directories, not files
 + Open in editor button
 + Rename files
-- Creating new files
-- Symlink support
++ Creating new files
 - Deleting files/folders
+- Symlink support
 - Multiple selections
 - Copying
 - Pasting

@@ -89,6 +89,20 @@ keyHandler.on("keypress", (key: KeyEvent) => {
                 (useFileStore.getState() as any).loadFiles();
             });
         }
+
+        // New file
+        if (key.name == "n" && inputBar) {
+            (useInputStore.getState() as any).setVisible(true);
+            (useInputStore.getState() as any).setValue("");
+            inputBar.focus();
+            inputBar.once(InputRenderableEvents.ENTER, (name: string) => {
+                (useInputStore.getState() as any).setVisible(false);
+                fileList.focus();
+                const dir = (useFileStore.getState() as any).directory;
+                fs.writeFileSync(`${dir}/${name}`, '');
+                (useFileStore.getState() as any).loadFiles();
+            });
+        }
     }
 });
 
