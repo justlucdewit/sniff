@@ -107,7 +107,8 @@ keyHandler.on("keypress", (key: KeyEvent) => {
         // Delete file
         if (key.name == "delete" || key.name == "d") {
             const target = (useFileStore.getState() as any).getSelectedItem();
-            fs.rmSync(target.name);
+            const dir = (useFileStore.getState() as any).directory;
+            fs.rmSync(`${dir}/${target.name}`);
             (useFileStore.getState() as any).loadFiles();
         }
     }
