@@ -23,18 +23,18 @@ This application uses the following keys:
 | e | Open in editor
 | q | Quit
 | r | rename item
+| delete | delete item
+| x | Close tab 
+| [ | Move a tab to the right
+| ] | Move a tab to the left
+| t | new tab
 
 In the future, these will be added:
 | Key | Description |
 | --- | --- |
 | / | Search in directory
 | ? | Key map
-| [ | Move a tab to the right
-| ] | Move a tab to the left
 | i | Dir/File information
-| space | new tab
-| x | Close tab 
 | f | Favorite current folder
 | c | Copy item
 | p | Paste item
-| delete | delete item

@@ -16,9 +16,9 @@
 - Searching
 
 # Tabs
-- Opening a new tab
-- Closing a tab
-- Cycling tabs
++ Opening a new tab
++ Closing a tab
++ Cycling tabs
 
 # Menu
 - Listing favorites
