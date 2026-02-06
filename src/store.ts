@@ -25,7 +25,27 @@ export const useTabsStore = create((set) => ({
         return {
             tabs: state.tabs.filter((v: string, i: number) => i != state.currentTabIndex)
         };
-    })
+    }),
+    nextTab: () => set((state: any) => {
+        let v = state.currentTabIndex;
+        if (v == state.tabs.length - 1) {
+            v = -1;
+        }
+
+        return {
+            currentTabIndex: (v + 1)
+        };
+    }),
+    previousTab: () => set((state: any) => {
+        let v = state.currentTabIndex;
+        if (v == 0) {
+            v = state.tabs.length;
+        }
+
+        return {
+            currentTabIndex: (v - 1)
+        };
+    }),
 }))
 
 export const useInputStore = create((set) => ({

@@ -45,6 +45,16 @@ keyHandler.on("keypress", (key: KeyEvent) => {
             (useTabsStore.getState() as any).closeTab();
         }
 
+        // Next tab
+        if (key.name == "]") {
+            (useTabsStore.getState() as any).nextTab();
+        }
+
+        // Previous tab
+        if (key.name == "[") {
+            (useTabsStore.getState() as any).previousTab();
+        }
+
         // Enter a directory
         if (key.name == "return") {
             // Open and load directory
