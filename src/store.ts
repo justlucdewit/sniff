@@ -21,6 +21,11 @@ const determineContentType = (file: string) => {
 export const useTabsStore = create((set) => ({
     tabs: [ "tab_1", "tab_2", "tab_3" ],
     currentTabIndex: 0,
+    closeTab: () => set((state: any) => {
+        return {
+            tabs: state.tabs.filter((v: string, i: number) => i != state.currentTabIndex)
+        };
+    })
 }))
 
 export const useInputStore = create((set) => ({

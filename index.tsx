@@ -1,6 +1,6 @@
 import { createCliRenderer, InputRenderable, type KeyEvent } from "@opentui/core"
 import { createRoot } from "@opentui/react"
-import { useFileStore, useInputStore } from "./src/store"
+import { useFileStore, useInputStore, useTabsStore } from "./src/store"
 import { exec } from 'child_process'
 import { App } from './src/App'
 import settings from './src/settings'
@@ -38,6 +38,11 @@ keyHandler.on("keypress", (key: KeyEvent) => {
         // Moving selection up
         if (key.name == "k") {
             (useFileStore.getState() as any).moveUp();
+        }
+
+        // Close current tab
+        if (key.name == "x") {
+            (useTabsStore.getState() as any).closeTab();
         }
 
         // Enter a directory
