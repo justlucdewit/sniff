@@ -47,12 +47,18 @@ keyHandler.on("keypress", (key: KeyEvent) => {
 
         // Next tab
         if (key.name == "]") {
+            (useTabsStore.getState() as any).saveTabData();
             (useTabsStore.getState() as any).nextTab();
+            (useTabsStore.getState() as any).loadTabData();
+            (useFileStore.getState() as any).loadFiles();
         }
 
         // Previous tab
         if (key.name == "[") {
+            (useTabsStore.getState() as any).saveTabData();
             (useTabsStore.getState() as any).previousTab();
+            (useTabsStore.getState() as any).loadTabData();
+            (useFileStore.getState() as any).loadFiles();
         }
 
         // Previous tab

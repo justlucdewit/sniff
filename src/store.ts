@@ -19,7 +19,11 @@ const determineContentType = (file: string) => {
 }
 
 export const useTabsStore = create((set) => ({
-    tabs: [ "tab_1", "tab_2", "tab_3" ],
+    tabs: [
+        { name: "tab_1", cwd: process.cwd(), cursorIndex: 0 },
+        { name: "tab_2", cwd: process.cwd(), cursorIndex: 0 },
+        { name: "tab_3", cwd: process.cwd(), cursorIndex: 0 }
+    ],
     currentTabIndex: 0,
     closeTab: () => set((state: any) => {
         return {
@@ -48,8 +52,38 @@ export const useTabsStore = create((set) => ({
     }),
     createNewTab: (name: string) => set((state: any) => {
         return {
-            tabs: state.tabs.concat(name),
+            tabs: state.tabs.concat({
+                name: name,
+                cwd: process.cwd(),
+                cursorIndex: 0
+            }),
         }
+    }),
+    saveTabData: () => set((state: any) => {
+        const newTabs = JSON.parse(JSON.stringify(state.tabs));
+        const fileStore = useFileStore.getState() as any;
+
+        newTabs[state.currentTabIndex] = {
+            name: state.tabs[state.currentTabIndex].name,
+            cwd: fileStore.directory,
+            cursorIndex: fileStore.cursorIndex
+        };
+
+        return {
+            tabs: newTabs
+        };
+    }),
+    loadTabData: () => set((state: any) => {
+        const memory = state.tabs[state.currentTabIndex] ?? null;
+
+        if (!memory)
+            return {};
+
+        // load
+        (useFileStore.getState() as any).setDirectory(memory.cwd);
+        (useFileStore.getState() as any).setIndex(memory.cursorIndex);
+
+        return {};
     })
 }))
 
