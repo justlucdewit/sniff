@@ -43,6 +43,8 @@ keyHandler.on("keypress", (key: KeyEvent) => {
         // Close current tab
         if (key.name == "x") {
             (useTabsStore.getState() as any).closeTab();
+            (useTabsStore.getState() as any).loadTabData();
+            (useFileStore.getState() as any).loadFiles();
         }
 
         // Next tab

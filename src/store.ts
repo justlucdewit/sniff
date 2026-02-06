@@ -20,14 +20,26 @@ const determineContentType = (file: string) => {
 
 export const useTabsStore = create((set) => ({
     tabs: [
-        { name: "tab_1", cwd: process.cwd(), cursorIndex: 0 },
-        { name: "tab_2", cwd: process.cwd(), cursorIndex: 0 },
-        { name: "tab_3", cwd: process.cwd(), cursorIndex: 0 }
+        { name: "new_tab", cwd: process.cwd(), cursorIndex: 0 }
     ],
     currentTabIndex: 0,
     closeTab: () => set((state: any) => {
+        
+        // 1. Create the new array
+        const newTabs = state.tabs.filter((_: any, i: number) => i !== state.currentTabIndex);
+        
+        // 2. Handle the case where the user closes the very last tab
+        // We move the index back by one, but never below 0
+        const nextIndex = Math.max(0, Math.min(state.currentTabIndex, newTabs.length - 1));
+
+        // 3. If no tab is left after closing, create a new default tab
+        if (newTabs.length == 0) {
+            newTabs.push({ name: "new_tab", cwd: process.cwd(), cursorIndex: 0 })
+        }
+
         return {
-            tabs: state.tabs.filter((v: string, i: number) => i != state.currentTabIndex)
+            tabs: newTabs,
+            currentTabIndex: nextIndex
         };
     }),
     nextTab: () => set((state: any) => {
