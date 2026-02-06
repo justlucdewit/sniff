@@ -46,6 +46,11 @@ export const useTabsStore = create((set) => ({
             currentTabIndex: (v - 1)
         };
     }),
+    createNewTab: (name: string) => set((state: any) => {
+        return {
+            tabs: state.tabs.concat(name),
+        }
+    })
 }))
 
 export const useInputStore = create((set) => ({

@@ -6,7 +6,7 @@ export function Tabs() {
     const currentTabIndex = useTabsStore((state: any) => state.currentTabIndex);
     return (
         <box width="100%" height={3} flexDirection="row">
-            { tabs.map((t: string, index: number) => <box borderStyle="rounded" borderColor={index == currentTabIndex ? settings.border.color.bright : settings.border.color.dimmed} width={9} height={3}>
+            { tabs.map((t: string, index: number) => <box borderStyle="rounded" borderColor={index == currentTabIndex ? settings.border.color.bright : settings.border.color.dimmed} width={t.length + 4} height={3}>
                 <text fg={settings.text.color.bright}>
                     &nbsp;{t}&nbsp;
                 </text>

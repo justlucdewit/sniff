@@ -55,6 +55,18 @@ keyHandler.on("keypress", (key: KeyEvent) => {
             (useTabsStore.getState() as any).previousTab();
         }
 
+        // Previous tab
+        if (key.name == "t" && inputBar) {
+            (useInputStore.getState() as any).setVisible(true);
+            (useInputStore.getState() as any).setValue("");
+            inputBar.focus();
+            inputBar.once(InputRenderableEvents.ENTER, (name: string) => {
+                (useInputStore.getState() as any).setVisible(false);
+                (useTabsStore.getState() as any).createNewTab(name);
+                fileList.focus();
+            });
+        }
+
         // Enter a directory
         if (key.name == "return") {
             // Open and load directory
