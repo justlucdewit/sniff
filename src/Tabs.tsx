@@ -1,16 +1,16 @@
 import settings from "./settings"
+import { useTabsStore } from "./store";
 
 export function Tabs() {
+    const tabs = useTabsStore((state: any) => state.tabs);
+    const currentTabIndex = useTabsStore((state: any) => state.currentTabIndex);
     return (
         <box width="100%" height={3} flexDirection="row">
-            
-            
-            {/* Render the tabs */}
-            <box borderStyle="rounded" borderColor={settings.border.color.bright} width={9} height={3}>
+            { tabs.map((t: string, index: number) => <box borderStyle="rounded" borderColor={index == currentTabIndex ? settings.border.color.bright : settings.border.color.dimmed} width={9} height={3}>
                 <text fg={settings.text.color.bright}>
-                    &nbsp;tab_1&nbsp;
+                    &nbsp;{t}&nbsp;
                 </text>
-            </box>
+            </box>) }
 
             <box borderStyle="rounded" borderColor={settings.border.color.dimmed} width={5} height={3}>
                 <text fg={settings.text.color.dimmed}>

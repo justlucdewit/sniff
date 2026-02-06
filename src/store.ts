@@ -18,6 +18,11 @@ const determineContentType = (file: string) => {
     }
 }
 
+export const useTabsStore = create((set) => ({
+    tabs: [ "tab_1", "tab_2", "tab_3" ],
+    currentTabIndex: 0,
+}))
+
 export const useInputStore = create((set) => ({
     visible: false,
     value: '',
