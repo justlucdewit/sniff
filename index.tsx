@@ -15,18 +15,35 @@ const keyHandler = renderer.keyInput;
 keyHandler.on("keypress", (key: KeyEvent) => {
     const inputBar = renderer.root.findDescendantById("inputbar");
     const fileList = renderer.root.findDescendantById("files");
+    const menu = renderer.root.findDescendantById("menu");
 
+    // Escape from input bar
     if (inputBar && fileList && inputBar.focused && key.name == "escape") {
         (useInputStore.getState() as any).setVisible(false);
         fileList.focus();
     }
 
-    // File list keybinds
-    if (fileList?.focused) {
+    // Switching to different panels
+    if (key.name == "tab" && menu && inputBar && fileList && !inputBar.focused) {
+        if (menu.focused) {
+            fileList.focus();
+        }
+
+        else if (fileList.focused) {
+            menu.focus();
+        }
+    }
+
+    // Keybinds in both menu and filelist
+    if (fileList?.focused || menu?.focused) {
         // Quit app
         if (key.name == "q") {
             renderer.destroy()
         }
+    }
+
+    // Filelist keybinds
+    if (fileList?.focused) {
 
         // Moving selection down
         if (key.name == "j") {
