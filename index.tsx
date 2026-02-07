@@ -16,11 +16,9 @@ keyHandler.on("keypress", (key: KeyEvent) => {
     const inputBar = renderer.root.findDescendantById("inputbar");
     const fileList = renderer.root.findDescendantById("files");
 
-    if (key.name == "tab") {
-        // if (fileList?.focused)
-        //     inputBar?.focus();
-        // else if (inputBar?.focused)
-        //     fileList?.focus();
+    if (inputBar && fileList && inputBar.focused && key.name == "escape") {
+        (useInputStore.getState() as any).setVisible(false);
+        fileList.focus();
     }
 
     // File list keybinds
