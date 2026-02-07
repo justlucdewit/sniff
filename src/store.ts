@@ -18,6 +18,14 @@ const determineContentType = (file: string) => {
     }
 }
 
+export const useSideMenuStore = create((set) => ({
+    favoriteDirectories: [
+        { name: "root", dir: "/" },
+        { name: "home", dir: "/Users/lucdewit" },
+        { name: "projects", dir: "/Users/lucdewit/projects" },
+    ]
+}))
+
 export const useTabsStore = create((set) => ({
     tabs: [
         { name: "new_tab", cwd: process.cwd(), cursorIndex: 0 }
