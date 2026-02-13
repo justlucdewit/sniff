@@ -20,11 +20,22 @@ const determineContentType = (file: string) => {
 }
 
 export const useSideMenuStore = create((set) => ({
+    cursorIndex: 0,
     favoriteDirectories: [
         { name: "root", dir: "/" },
         { name: "home", dir: os.homedir() },
         { name: "projects", dir: path.join(os.homedir(), "projects") },
     ],
+    moveUp: () => set((state: any) => ({
+        cursorIndex: Math.max(state.cursorIndex - 1, 0)
+    })),
+    moveDown: () => set((state: any) => ({
+        cursorIndex: Math.min(
+            state.cursorIndex + 1,
+            (useSideMenuStore.getState() as any).favoriteDirectories.length - 1
+        )
+    })),
+    setIndex: (index: number) => set({ cursorIndex: index }),
     addFavoriteDirectory: (name: string, dir: string) => set((state: any) => {
         const existing = state.favoriteDirectories.find((item: any) => item.dir === dir);
 

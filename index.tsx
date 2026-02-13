@@ -49,6 +49,17 @@ keyHandler.on("keypress", (key: KeyEvent) => {
         }
     }
 
+    // Side menu keybinds
+    if (menu?.focused) {
+        if (key.name == "j") {
+            (useSideMenuStore.getState() as any).moveDown();
+        }
+
+        if (key.name == "k") {
+            (useSideMenuStore.getState() as any).moveUp();
+        }
+    }
+
     // Filelist keybinds
     if (fileList?.focused) {
 
