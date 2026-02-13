@@ -23,7 +23,22 @@ export const useSideMenuStore = create((set) => ({
         { name: "root", dir: "/" },
         { name: "home", dir: "/Users/lucdewit" },
         { name: "projects", dir: "/Users/lucdewit/projects" },
-    ]
+    ],
+    addFavoriteDirectory: (name: string, dir: string) => set((state: any) => {
+        const existing = state.favoriteDirectories.find((item: any) => item.dir === dir);
+
+        if (existing) {
+            return {
+                favoriteDirectories: state.favoriteDirectories.map((item: any) =>
+                    item.dir === dir ? { ...item, name } : item
+                )
+            };
+        }
+
+        return {
+            favoriteDirectories: state.favoriteDirectories.concat({ name, dir })
+        };
+    })
 }))
 
 export const useTabsStore = create((set) => ({

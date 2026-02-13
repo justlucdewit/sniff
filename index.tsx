@@ -1,6 +1,6 @@
 import { createCliRenderer, InputRenderable, type KeyEvent } from "@opentui/core"
 import { createRoot } from "@opentui/react"
-import { useFileStore, useInputStore, useTabsStore } from "./src/store"
+import { useFileStore, useInputStore, useSideMenuStore, useTabsStore } from "./src/store"
 import { exec } from 'child_process'
 import { App } from './src/App'
 import settings from './src/settings'
@@ -80,12 +80,35 @@ keyHandler.on("keypress", (key: KeyEvent) => {
 
         // Previous tab
         if (key.name == "t" && inputBar) {
+            key.preventDefault();
+            key.stopPropagation();
             (useInputStore.getState() as any).setVisible(true);
             (useInputStore.getState() as any).setValue("");
             inputBar.focus();
             inputBar.once(InputRenderableEvents.ENTER, (name: string) => {
                 (useInputStore.getState() as any).setVisible(false);
                 (useTabsStore.getState() as any).createNewTab(name);
+                fileList.focus();
+            });
+        }
+
+        // Add current directory to favorites
+        if (key.name == "f" && inputBar) {
+            key.preventDefault();
+            key.stopPropagation();
+            const cwd = (useFileStore.getState() as any).directory ?? process.cwd();
+            const defaultName = cwd == "/" ? "root" : cwd.split("/").filter(Boolean).pop();
+
+            (useInputStore.getState() as any).setVisible(true);
+            (useInputStore.getState() as any).setValue(defaultName ?? "");
+            inputBar.focus();
+            inputBar.once(InputRenderableEvents.ENTER, (name: string) => {
+                const favoriteName = name.trim();
+                (useInputStore.getState() as any).setVisible(false);
+                (useSideMenuStore.getState() as any).addFavoriteDirectory(
+                    favoriteName.length > 0 ? favoriteName : (defaultName ?? cwd),
+                    cwd
+                );
                 fileList.focus();
             });
         }
@@ -127,6 +150,8 @@ keyHandler.on("keypress", (key: KeyEvent) => {
 
         // Rename file
         if (key.name == "r" && inputBar) {
+            key.preventDefault();
+            key.stopPropagation();
             (useInputStore.getState() as any).setVisible(true);
             const oldName = (useFileStore.getState() as any).getSelectedItem();
             (useInputStore.getState() as any).setValue(oldName.name);
@@ -142,6 +167,8 @@ keyHandler.on("keypress", (key: KeyEvent) => {
 
         // New file
         if (key.name == "n" && inputBar) {
+            key.preventDefault();
+            key.stopPropagation();
             (useInputStore.getState() as any).setVisible(true);
             (useInputStore.getState() as any).setValue("");
             inputBar.focus();

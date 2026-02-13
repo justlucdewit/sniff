@@ -28,6 +28,7 @@ This application uses the following keys:
 | [ | Move a tab to the right
 | ] | Move a tab to the left
 | t | new tab
+| f | Favorite current folder |
 
 In the future, these will be added:
 | Key | Description |
@@ -35,6 +36,5 @@ In the future, these will be added:
 | / | Search in directory
 | ? | Key map
 | i | Dir/File information
-| f | Favorite current folder
 | c | Copy item
 | p | Paste item
