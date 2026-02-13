@@ -8,7 +8,14 @@ import { InputRenderableEvents } from "@opentui/core"
 import fs from "fs"
 
 const renderer = await createCliRenderer();
-createRoot(renderer).render(<App />)
+createRoot(renderer).render(<App />);
+
+(useSideMenuStore.getState() as any).loadFavoriteDirectories();
+useSideMenuStore.subscribe((state: any, prevState: any) => {
+    if (state.favoriteDirectories !== prevState.favoriteDirectories) {
+        (useSideMenuStore.getState() as any).saveFavoriteDirectories();
+    }
+});
 
 const keyHandler = renderer.keyInput;
 

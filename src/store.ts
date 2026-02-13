@@ -1,6 +1,7 @@
 import fs from 'fs'
 import { create } from 'zustand';
 import path from "path"
+import os from "os"
 
 type FileType = "dir" | "file" | "unknown";
 
@@ -21,12 +22,13 @@ const determineContentType = (file: string) => {
 export const useSideMenuStore = create((set) => ({
     favoriteDirectories: [
         { name: "root", dir: "/" },
-        { name: "home", dir: "/Users/lucdewit" },
-        { name: "projects", dir: "/Users/lucdewit/projects" },
+        { name: "home", dir: os.homedir() },
+        { name: "projects", dir: path.join(os.homedir(), "projects") },
     ],
     addFavoriteDirectory: (name: string, dir: string) => set((state: any) => {
         const existing = state.favoriteDirectories.find((item: any) => item.dir === dir);
 
+        // Replace the existing
         if (existing) {
             return {
                 favoriteDirectories: state.favoriteDirectories.map((item: any) =>
@@ -35,10 +37,44 @@ export const useSideMenuStore = create((set) => ({
             };
         }
 
+        // Add a new item
         return {
             favoriteDirectories: state.favoriteDirectories.concat({ name, dir })
         };
-    })
+    }),
+
+    saveFavoriteDirectories: () => {
+        const configPath = path.join(os.homedir(), "sniffconfig.json");
+        const favoriteDirectories = (useSideMenuStore.getState() as any).favoriteDirectories;
+
+        fs.writeFileSync(
+            configPath,
+            JSON.stringify({ favoriteDirectories }, null, 2)
+        );
+    },
+    
+    loadFavoriteDirectories: () => {
+        const configPath = path.join(os.homedir(), "sniffconfig.json");
+
+        if (!fs.existsSync(configPath)) {
+            const favoriteDirectories = (useSideMenuStore.getState() as any).favoriteDirectories;
+            fs.writeFileSync(
+                configPath,
+                JSON.stringify({ favoriteDirectories }, null, 2)
+            );
+            return;
+        }
+
+        const raw = fs.readFileSync(configPath, "utf-8");
+        const parsed = JSON.parse(raw);
+        const loadedFavorites = Array.isArray(parsed?.favoriteDirectories)
+            ? parsed.favoriteDirectories
+            : [];
+
+        if (loadedFavorites.length > 0) {
+            set({ favoriteDirectories: loadedFavorites });
+        }
+    }
 }))
 
 export const useTabsStore = create((set) => ({
