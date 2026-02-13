@@ -23,6 +23,8 @@ keyHandler.on("keypress", (key: KeyEvent) => {
     const inputBar = renderer.root.findDescendantById("inputbar");
     const fileList = renderer.root.findDescendantById("files");
     const menu = renderer.root.findDescendantById("menu");
+    const fileListWasFocused = !!fileList?.focused;
+    const menuWasFocused = !!menu?.focused;
 
     // Escape from input bar
     if (inputBar && fileList && inputBar.focused && key.name == "escape") {
@@ -42,7 +44,7 @@ keyHandler.on("keypress", (key: KeyEvent) => {
     }
 
     // Keybinds in both menu and filelist
-    if (fileList?.focused || menu?.focused) {
+    if (fileListWasFocused || menuWasFocused) {
         // Quit app
         if (key.name == "q") {
             renderer.destroy()
@@ -50,7 +52,7 @@ keyHandler.on("keypress", (key: KeyEvent) => {
     }
 
     // Side menu keybinds
-    if (menu?.focused) {
+    if (menuWasFocused) {
         if (key.name == "j") {
             (useSideMenuStore.getState() as any).moveDown();
         }
@@ -58,10 +60,24 @@ keyHandler.on("keypress", (key: KeyEvent) => {
         if (key.name == "k") {
             (useSideMenuStore.getState() as any).moveUp();
         }
+
+        if (key.name == "return" && fileList) {
+            key.preventDefault();
+            key.stopPropagation();
+            const sideMenuStore = useSideMenuStore.getState() as any;
+            const selectedFavorite = sideMenuStore.favoriteDirectories[sideMenuStore.cursorIndex];
+
+            if (selectedFavorite?.dir) {
+                (useFileStore.getState() as any).setDirectory(selectedFavorite.dir);
+                (useFileStore.getState() as any).loadFiles();
+                (useFileStore.getState() as any).resetSelectedItem();
+                fileList.focus();
+            }
+        }
     }
 
     // Filelist keybinds
-    if (fileList?.focused) {
+    if (fileListWasFocused) {
 
         // Moving selection down
         if (key.name == "j") {
