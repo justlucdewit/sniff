@@ -24,11 +24,17 @@ This application uses the following keys:
 | q | Quit
 | r | rename item
 | delete | delete item
-| x | Close tab 
+| x | Close tab |
 | [ | Move a tab to the right
 | ] | Move a tab to the left
 | t | new tab
+
+### Favorites
+| Key | Description |
+| --- | --- |
 | f | Favorite current folder |
+| x | Remove favorite item |
+| tab | Switch between favorites and current folder |
 
 In the future, these will be added:
 | Key | Description |

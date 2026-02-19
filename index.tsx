@@ -61,6 +61,13 @@ keyHandler.on("keypress", (key: KeyEvent) => {
             (useSideMenuStore.getState() as any).moveUp();
         }
 
+        if (key.name == "x") {
+            key.preventDefault();
+            key.stopPropagation();
+            const sideMenuStore = useSideMenuStore.getState() as any;
+            sideMenuStore.removeFavoriteDirectory(sideMenuStore.cursorIndex);
+        }
+
         if (key.name == "return" && fileList) {
             key.preventDefault();
             key.stopPropagation();

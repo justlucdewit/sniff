@@ -53,6 +53,15 @@ export const useSideMenuStore = create((set) => ({
             favoriteDirectories: state.favoriteDirectories.concat({ name, dir })
         };
     }),
+    removeFavoriteDirectory: (index: number) => set((state: any) => {
+        const favoriteDirectories = state.favoriteDirectories.filter((_: any, i: number) => i !== index);
+        const maxIndex = Math.max(0, favoriteDirectories.length - 1);
+
+        return {
+            favoriteDirectories,
+            cursorIndex: Math.min(state.cursorIndex, maxIndex)
+        };
+    }),
 
     saveFavoriteDirectories: () => {
         const configPath = path.join(os.homedir(), "sniffconfig.json");
