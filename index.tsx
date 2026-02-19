@@ -76,7 +76,7 @@ keyHandler.on("keypress", (key: KeyEvent) => {
             (useSideMenuStore.getState() as any).moveFavoriteDirectoryUp();
         }
 
-        if (key.name == "x") {
+        if (key.name == "delete") {
             key.preventDefault();
             key.stopPropagation();
             const sideMenuStore = useSideMenuStore.getState() as any;

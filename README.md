@@ -19,15 +19,15 @@ This application uses the following keys:
 | j | Move selection down |
 | k | Move selection up |
 | enter | Enter directory |
-| backspace | Go to parent directory
-| e | Open in editor
-| q | Quit
-| r | rename item
-| delete | delete item
+| backspace | Go to parent directory |
+| e | Open in editor |
+| q | Quit |
+| r | rename item |
+| delete | delete item |
 | x | Close tab |
-| [ | Move a tab to the right
-| ] | Move a tab to the left
-| t | new tab
+| [ | Move a tab to the right |
+| ] | Move a tab to the left | 
+| t | new tab |
 
 ### Favorites
 | Key | Description |
