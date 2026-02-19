@@ -23,7 +23,7 @@ This application uses the following keys:
 | e | Open in editor |
 | q | Quit |
 | r | rename item |
-| delete | delete item |
+| delete | delete item(s) |
 | x | Close tab |
 | [ | Move a tab to the right |
 | ] | Move a tab to the left | 

@@ -275,10 +275,30 @@ keyHandler.on("keypress", (key: KeyEvent) => {
 
         // Delete file
         if (key.name == "delete" || key.name == "d") {
-            const target = (useFileStore.getState() as any).getSelectedItem();
-            const dir = (useFileStore.getState() as any).directory;
-            fs.rmSync(`${dir}/${target.name}`);
+            const fileStore = useFileStore.getState() as any;
+            const dir = fileStore.directory ?? "";
+            const files = fileStore.files ?? [];
+            const cursorIndex = fileStore.cursorIndex ?? 0;
+            const offset = fileStore.multiSelectOffsetIndex ?? 0;
+            const start = Math.max(0, Math.min(cursorIndex, cursorIndex + offset));
+            const end = Math.min(files.length - 1, Math.max(cursorIndex, cursorIndex + offset));
+            const deletedCount = Math.max(0, end - start + 1);
+            const remainingCount = Math.max(0, files.length - deletedCount);
+
+            for (let i = start; i <= end; i += 1) {
+                const target = files[i];
+                if (!target?.name) {
+                    continue;
+                }
+                fs.rmSync(`${dir}/${target.name}`);
+            }
+
             (useFileStore.getState() as any).loadFiles();
+            const previousSurvivingIndex = Math.max(0, start - 1);
+            const nextIndex = remainingCount > 0
+                ? Math.min(previousSurvivingIndex, remainingCount - 1)
+                : 0;
+            (useFileStore.getState() as any).setIndex(nextIndex);
         }
     }
 });
