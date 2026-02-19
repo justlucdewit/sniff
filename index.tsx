@@ -83,6 +83,30 @@ keyHandler.on("keypress", (key: KeyEvent) => {
             sideMenuStore.removeFavoriteDirectory(sideMenuStore.cursorIndex);
         }
 
+        if (key.name == "f" && inputBar) {
+            key.preventDefault();
+            key.stopPropagation();
+            const sideMenuStore = useSideMenuStore.getState() as any;
+            const selectedFavorite = sideMenuStore.favoriteDirectories[sideMenuStore.cursorIndex];
+
+            if (!selectedFavorite?.dir) {
+                return;
+            }
+
+            (useInputStore.getState() as any).setVisible(true);
+            (useInputStore.getState() as any).setValue(selectedFavorite.name ?? "");
+            inputBar.focus();
+            inputBar.once(InputRenderableEvents.ENTER, (name: string) => {
+                const favoriteName = name.trim();
+                (useInputStore.getState() as any).setVisible(false);
+                (useSideMenuStore.getState() as any).addFavoriteDirectory(
+                    favoriteName.length > 0 ? favoriteName : selectedFavorite.name,
+                    selectedFavorite.dir
+                );
+                menu.focus();
+            });
+        }
+
         if (key.name == "return" && fileList) {
             key.preventDefault();
             key.stopPropagation();

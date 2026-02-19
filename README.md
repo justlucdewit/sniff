@@ -32,7 +32,8 @@ This application uses the following keys:
 ### Favorites
 | Key | Description |
 | --- | --- |
-| f | Favorite current folder |
+| f (in main view) | Favorite current folder |
+| f (in sidebar) | Rename favorite item |
 | x | Remove favorite item |
 | shift + j | Move favorite item down |
 | shift + k | Move favorite item up |
