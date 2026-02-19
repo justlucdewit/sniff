@@ -134,7 +134,7 @@ export const useSideMenuStore = create((set) => ({
 
 export const useTabsStore = create((set) => ({
     tabs: [
-        { name: "new_tab", cwd: process.cwd(), cursorIndex: 0, multiSelectOffsetIndex: 0 }
+        { name: "new_tab", cwd: process.cwd(), cursorIndex: 0, multiSelectOffsetIndex: 0, searchQuery: "" }
     ],
     currentTabIndex: 0,
     closeTab: () => set((state: any) => {
@@ -148,7 +148,7 @@ export const useTabsStore = create((set) => ({
 
         // 3. If no tab is left after closing, create a new default tab
         if (newTabs.length == 0) {
-            newTabs.push({ name: "new_tab", cwd: process.cwd(), cursorIndex: 0, multiSelectOffsetIndex: 0 })
+            newTabs.push({ name: "new_tab", cwd: process.cwd(), cursorIndex: 0, multiSelectOffsetIndex: 0, searchQuery: "" })
         }
 
         return {
@@ -182,7 +182,8 @@ export const useTabsStore = create((set) => ({
                 name: name,
                 cwd: process.cwd(),
                 cursorIndex: 0,
-                multiSelectOffsetIndex: 0
+                multiSelectOffsetIndex: 0,
+                searchQuery: ""
             }),
         }
     }),
@@ -194,7 +195,8 @@ export const useTabsStore = create((set) => ({
             name: state.tabs[state.currentTabIndex].name,
             cwd: fileStore.directory,
             cursorIndex: fileStore.cursorIndex,
-            multiSelectOffsetIndex: fileStore.multiSelectOffsetIndex
+            multiSelectOffsetIndex: fileStore.multiSelectOffsetIndex,
+            searchQuery: fileStore.searchQuery ?? ""
         };
 
         return {
@@ -209,6 +211,10 @@ export const useTabsStore = create((set) => ({
 
         // load
         (useFileStore.getState() as any).setDirectory(memory.cwd);
+        (useFileStore.getState() as any).setSearchQuery(
+            memory.searchQuery ?? "",
+            false
+        );
         (useFileStore.getState() as any).setSelection(
             memory.cursorIndex ?? 0,
             memory.multiSelectOffsetIndex ?? 0
@@ -220,14 +226,17 @@ export const useTabsStore = create((set) => ({
 
 export const useInputStore = create((set) => ({
     visible: false,
+    mode: "none",
     value: '',
     setVisible: (visible: boolean) => set({ visible: visible }),
+    setMode: (mode: "none" | "prompt" | "search") => set({ mode: mode }),
     setValue: (value: string) => set({ value: value }),
 }))
 
 export const useFileStore = create((set) => ({
     cursorIndex: 0,
     multiSelectOffsetIndex: 0,
+    searchQuery: "",
     directory: "/",
     files: [],
   
@@ -269,9 +278,15 @@ export const useFileStore = create((set) => ({
         cursorIndex: Math.max(0, index),
         multiSelectOffsetIndex: offset
     }),
+    setSearchQuery: (query: string, resetSelection: boolean = true) => set((state: any) => ({
+        searchQuery: query,
+        cursorIndex: resetSelection ? 0 : state.cursorIndex,
+        multiSelectOffsetIndex: resetSelection ? 0 : state.multiSelectOffsetIndex
+    })),
 
     setDirectory: (dir: string) => set((state: any) => ({
-        directory: dir
+        directory: dir,
+        searchQuery: ""
     })),
 
     getSelectedItem: (dir: string) => {
@@ -289,6 +304,7 @@ export const useFileStore = create((set) => ({
 
     loadFiles: () => {
         const directory = (useFileStore.getState() as any).directory
+        const searchQuery = ((useFileStore.getState() as any).searchQuery ?? "").toLowerCase();
         
         // Safely read directory
         const content = fs.readdirSync(directory);
@@ -333,6 +349,23 @@ export const useFileStore = create((set) => ({
             indx: index
         }));
 
-        set({ files: sortedFiles });
+        const filteredFiles = searchQuery.length > 0
+            ? sortedFiles.filter((file) => file.name.toLowerCase().includes(searchQuery))
+            : sortedFiles;
+        const maxIndex = Math.max(0, filteredFiles.length - 1);
+        const currentCursor = (useFileStore.getState() as any).cursorIndex ?? 0;
+        const currentOffset = (useFileStore.getState() as any).multiSelectOffsetIndex ?? 0;
+        const clampedCursor = Math.min(Math.max(0, currentCursor), maxIndex);
+        const minOffset = -clampedCursor;
+        const maxOffset = maxIndex - clampedCursor;
+        const clampedOffset = filteredFiles.length > 0
+            ? Math.min(maxOffset, Math.max(minOffset, currentOffset))
+            : 0;
+
+        set({
+            files: filteredFiles.map((file, index) => ({ ...file, indx: index })),
+            cursorIndex: clampedCursor,
+            multiSelectOffsetIndex: clampedOffset
+        });
     },
 }));

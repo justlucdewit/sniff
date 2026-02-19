@@ -16,6 +16,14 @@ useSideMenuStore.subscribe((state: any, prevState: any) => {
         (useSideMenuStore.getState() as any).saveFavoriteDirectories();
     }
 });
+useInputStore.subscribe((state: any, prevState: any) => {
+    if (!state.visible || state.mode !== "search" || state.value === prevState.value) {
+        return;
+    }
+
+    (useFileStore.getState() as any).setSearchQuery(state.value, false);
+    (useFileStore.getState() as any).loadFiles();
+});
 
 const keyHandler = renderer.keyInput;
 
@@ -29,6 +37,7 @@ keyHandler.on("keypress", (key: KeyEvent) => {
     // Escape from input bar
     if (inputBar && fileList && inputBar.focused && key.name == "escape") {
         (useInputStore.getState() as any).setVisible(false);
+        (useInputStore.getState() as any).setMode("none");
         fileList.focus();
     }
 
@@ -94,11 +103,13 @@ keyHandler.on("keypress", (key: KeyEvent) => {
             }
 
             (useInputStore.getState() as any).setVisible(true);
+            (useInputStore.getState() as any).setMode("prompt");
             (useInputStore.getState() as any).setValue(selectedFavorite.name ?? "");
             inputBar.focus();
             inputBar.once(InputRenderableEvents.ENTER, (name: string) => {
                 const favoriteName = name.trim();
                 (useInputStore.getState() as any).setVisible(false);
+                (useInputStore.getState() as any).setMode("none");
                 (useSideMenuStore.getState() as any).addFavoriteDirectory(
                     favoriteName.length > 0 ? favoriteName : selectedFavorite.name,
                     selectedFavorite.dir
@@ -175,11 +186,29 @@ keyHandler.on("keypress", (key: KeyEvent) => {
             key.preventDefault();
             key.stopPropagation();
             (useInputStore.getState() as any).setVisible(true);
+            (useInputStore.getState() as any).setMode("prompt");
             (useInputStore.getState() as any).setValue("");
             inputBar.focus();
             inputBar.once(InputRenderableEvents.ENTER, (name: string) => {
                 (useInputStore.getState() as any).setVisible(false);
+                (useInputStore.getState() as any).setMode("none");
                 (useTabsStore.getState() as any).createNewTab(name);
+                fileList.focus();
+            });
+        }
+
+        // Search files/folders in current directory
+        if (key.name == "/" && inputBar) {
+            key.preventDefault();
+            key.stopPropagation();
+            const fileStore = useFileStore.getState() as any;
+            (useInputStore.getState() as any).setVisible(true);
+            (useInputStore.getState() as any).setMode("search");
+            (useInputStore.getState() as any).setValue(fileStore.searchQuery ?? "");
+            inputBar.focus();
+            inputBar.once(InputRenderableEvents.ENTER, () => {
+                (useInputStore.getState() as any).setVisible(false);
+                (useInputStore.getState() as any).setMode("none");
                 fileList.focus();
             });
         }
@@ -192,11 +221,13 @@ keyHandler.on("keypress", (key: KeyEvent) => {
             const defaultName = cwd == "/" ? "root" : cwd.split("/").filter(Boolean).pop();
 
             (useInputStore.getState() as any).setVisible(true);
+            (useInputStore.getState() as any).setMode("prompt");
             (useInputStore.getState() as any).setValue(defaultName ?? "");
             inputBar.focus();
             inputBar.once(InputRenderableEvents.ENTER, (name: string) => {
                 const favoriteName = name.trim();
                 (useInputStore.getState() as any).setVisible(false);
+                (useInputStore.getState() as any).setMode("none");
                 (useSideMenuStore.getState() as any).addFavoriteDirectory(
                     favoriteName.length > 0 ? favoriteName : (defaultName ?? cwd),
                     cwd
@@ -245,11 +276,13 @@ keyHandler.on("keypress", (key: KeyEvent) => {
             key.preventDefault();
             key.stopPropagation();
             (useInputStore.getState() as any).setVisible(true);
+            (useInputStore.getState() as any).setMode("prompt");
             const oldName = (useFileStore.getState() as any).getSelectedItem();
             (useInputStore.getState() as any).setValue(oldName.name);
             inputBar.focus();
             inputBar.once(InputRenderableEvents.ENTER, (newName: string) => {
                 (useInputStore.getState() as any).setVisible(false);
+                (useInputStore.getState() as any).setMode("none");
                 fileList.focus();
                 const dir = (useFileStore.getState() as any).directory;
                 fs.renameSync(`${dir}/${oldName.name}`, `${dir}/${newName}`);
@@ -262,10 +295,12 @@ keyHandler.on("keypress", (key: KeyEvent) => {
             key.preventDefault();
             key.stopPropagation();
             (useInputStore.getState() as any).setVisible(true);
+            (useInputStore.getState() as any).setMode("prompt");
             (useInputStore.getState() as any).setValue("");
             inputBar.focus();
             inputBar.once(InputRenderableEvents.ENTER, (name: string) => {
                 (useInputStore.getState() as any).setVisible(false);
+                (useInputStore.getState() as any).setMode("none");
                 fileList.focus();
                 const dir = (useFileStore.getState() as any).directory;
                 fs.writeFileSync(`${dir}/${name}`, '');
