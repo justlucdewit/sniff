@@ -124,15 +124,27 @@ keyHandler.on("keypress", (key: KeyEvent) => {
 
     // Filelist keybinds
     if (fileListWasFocused) {
+        const shiftJ = key.name == "J" || (key.name == "j" && !!(key as any).shift);
+        const shiftK = key.name == "K" || (key.name == "k" && !!(key as any).shift);
 
         // Moving selection down
-        if (key.name == "j") {
+        if (key.name == "j" && !shiftJ) {
             (useFileStore.getState() as any).moveDown();
         }
     
         // Moving selection up
-        if (key.name == "k") {
+        if (key.name == "k" && !shiftK) {
             (useFileStore.getState() as any).moveUp();
+        }
+
+        // Extend multiselection down
+        if (shiftJ) {
+            (useFileStore.getState() as any).extendSelectionDown();
+        }
+
+        // Extend multiselection up
+        if (shiftK) {
+            (useFileStore.getState() as any).extendSelectionUp();
         }
 
         // Close current tab

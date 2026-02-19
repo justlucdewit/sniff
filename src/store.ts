@@ -222,18 +222,44 @@ export const useInputStore = create((set) => ({
 
 export const useFileStore = create((set) => ({
     cursorIndex: 0,
+    multiSelectOffsetIndex: 0,
     directory: "/",
     files: [],
   
     moveUp: () => set((state: any) => ({ 
-        cursorIndex: Math.max(state.cursorIndex - 1, 0)
+        cursorIndex: Math.max(state.cursorIndex - 1, 0),
+        multiSelectOffsetIndex: 0
     })),
 
     moveDown: () => set((state: any) => ({ 
-        cursorIndex: Math.min(state.cursorIndex + 1, (useFileStore.getState() as any).files.length - 1)
+        cursorIndex: Math.min(state.cursorIndex + 1, (useFileStore.getState() as any).files.length - 1),
+        multiSelectOffsetIndex: 0
     })),
 
-    setIndex: (index: number) => set({ cursorIndex: index }),
+    extendSelectionUp: () => set((state: any) => {
+        const offset = state.multiSelectOffsetIndex - 1;
+        const minOffset = -state.cursorIndex;
+
+        return {
+            multiSelectOffsetIndex: Math.max(minOffset, offset)
+        };
+    }),
+
+    extendSelectionDown: () => set((state: any) => {
+        const files = (useFileStore.getState() as any).files;
+        const maxIndex = Math.max(0, files.length - 1);
+        const offset = state.multiSelectOffsetIndex + 1;
+        const maxOffset = maxIndex - state.cursorIndex;
+
+        return {
+            multiSelectOffsetIndex: Math.min(maxOffset, offset)
+        };
+    }),
+
+    setIndex: (index: number) => set({
+        cursorIndex: index,
+        multiSelectOffsetIndex: 0
+    }),
 
     setDirectory: (dir: string) => set((state: any) => ({
         directory: dir
@@ -248,7 +274,8 @@ export const useFileStore = create((set) => ({
     },
 
     resetSelectedItem: () => set((state: any) => ({
-        cursorIndex: 0
+        cursorIndex: 0,
+        multiSelectOffsetIndex: 0
     })),
 
     loadFiles: () => {
