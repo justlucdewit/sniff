@@ -134,7 +134,7 @@ export const useSideMenuStore = create((set) => ({
 
 export const useTabsStore = create((set) => ({
     tabs: [
-        { name: "new_tab", cwd: process.cwd(), cursorIndex: 0 }
+        { name: "new_tab", cwd: process.cwd(), cursorIndex: 0, multiSelectOffsetIndex: 0 }
     ],
     currentTabIndex: 0,
     closeTab: () => set((state: any) => {
@@ -148,7 +148,7 @@ export const useTabsStore = create((set) => ({
 
         // 3. If no tab is left after closing, create a new default tab
         if (newTabs.length == 0) {
-            newTabs.push({ name: "new_tab", cwd: process.cwd(), cursorIndex: 0 })
+            newTabs.push({ name: "new_tab", cwd: process.cwd(), cursorIndex: 0, multiSelectOffsetIndex: 0 })
         }
 
         return {
@@ -181,7 +181,8 @@ export const useTabsStore = create((set) => ({
             tabs: state.tabs.concat({
                 name: name,
                 cwd: process.cwd(),
-                cursorIndex: 0
+                cursorIndex: 0,
+                multiSelectOffsetIndex: 0
             }),
         }
     }),
@@ -192,7 +193,8 @@ export const useTabsStore = create((set) => ({
         newTabs[state.currentTabIndex] = {
             name: state.tabs[state.currentTabIndex].name,
             cwd: fileStore.directory,
-            cursorIndex: fileStore.cursorIndex
+            cursorIndex: fileStore.cursorIndex,
+            multiSelectOffsetIndex: fileStore.multiSelectOffsetIndex
         };
 
         return {
@@ -207,7 +209,10 @@ export const useTabsStore = create((set) => ({
 
         // load
         (useFileStore.getState() as any).setDirectory(memory.cwd);
-        (useFileStore.getState() as any).setIndex(memory.cursorIndex);
+        (useFileStore.getState() as any).setSelection(
+            memory.cursorIndex ?? 0,
+            memory.multiSelectOffsetIndex ?? 0
+        );
 
         return {};
     })
@@ -259,6 +264,10 @@ export const useFileStore = create((set) => ({
     setIndex: (index: number) => set({
         cursorIndex: index,
         multiSelectOffsetIndex: 0
+    }),
+    setSelection: (index: number, offset: number) => set({
+        cursorIndex: Math.max(0, index),
+        multiSelectOffsetIndex: offset
     }),
 
     setDirectory: (dir: string) => set((state: any) => ({
