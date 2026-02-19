@@ -53,12 +53,27 @@ keyHandler.on("keypress", (key: KeyEvent) => {
 
     // Side menu keybinds
     if (menuWasFocused) {
-        if (key.name == "j") {
+        const shiftJ = key.name == "J" || (key.name == "j" && !!(key as any).shift);
+        const shiftK = key.name == "K" || (key.name == "k" && !!(key as any).shift);
+
+        if (key.name == "j" && !shiftJ) {
             (useSideMenuStore.getState() as any).moveDown();
         }
 
-        if (key.name == "k") {
+        if (key.name == "k" && !shiftK) {
             (useSideMenuStore.getState() as any).moveUp();
+        }
+
+        if (shiftJ) {
+            key.preventDefault();
+            key.stopPropagation();
+            (useSideMenuStore.getState() as any).moveFavoriteDirectoryDown();
+        }
+
+        if (shiftK) {
+            key.preventDefault();
+            key.stopPropagation();
+            (useSideMenuStore.getState() as any).moveFavoriteDirectoryUp();
         }
 
         if (key.name == "x") {

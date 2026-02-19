@@ -62,6 +62,41 @@ export const useSideMenuStore = create((set) => ({
             cursorIndex: Math.min(state.cursorIndex, maxIndex)
         };
     }),
+    moveFavoriteDirectoryDown: () => set((state: any) => {
+        const index = state.cursorIndex;
+        const lastIndex = state.favoriteDirectories.length - 1;
+
+        if (index >= lastIndex) {
+            return {};
+        }
+
+        const favoriteDirectories = [...state.favoriteDirectories];
+        const current = favoriteDirectories[index];
+        favoriteDirectories[index] = favoriteDirectories[index + 1];
+        favoriteDirectories[index + 1] = current;
+
+        return {
+            favoriteDirectories,
+            cursorIndex: index + 1
+        };
+    }),
+    moveFavoriteDirectoryUp: () => set((state: any) => {
+        const index = state.cursorIndex;
+
+        if (index <= 0) {
+            return {};
+        }
+
+        const favoriteDirectories = [...state.favoriteDirectories];
+        const current = favoriteDirectories[index];
+        favoriteDirectories[index] = favoriteDirectories[index - 1];
+        favoriteDirectories[index - 1] = current;
+
+        return {
+            favoriteDirectories,
+            cursorIndex: index - 1
+        };
+    }),
 
     saveFavoriteDirectories: () => {
         const configPath = path.join(os.homedir(), "sniffconfig.json");

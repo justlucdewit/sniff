@@ -34,6 +34,8 @@ This application uses the following keys:
 | --- | --- |
 | f | Favorite current folder |
 | x | Remove favorite item |
+| shift + j | Move favorite item down |
+| shift + k | Move favorite item up |
 | tab | Switch between favorites and current folder |
 
 In the future, these will be added:
