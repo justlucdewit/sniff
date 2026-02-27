@@ -19,6 +19,13 @@ globalThis.popup = (message: string) => {
 };
 
 const lastDirectoryFilePath = path.join(os.homedir(), ".sniff-last-dir");
+type ClipboardEntry = {
+    sourcePath: string;
+    name: string;
+};
+
+let clipboardEntries: ClipboardEntry[] = [];
+
 const persistLastDirectory = (dir: string) => {
     if (!dir || typeof dir !== "string") {
         return;
@@ -30,6 +37,32 @@ const persistLastDirectory = (dir: string) => {
     catch {
         // Ignore persistence errors so navigation keeps working.
     }
+};
+
+const getSelectionRange = (fileStore: any) => {
+    const files = fileStore.files ?? [];
+    const cursorIndex = fileStore.cursorIndex ?? 0;
+    const offset = fileStore.multiSelectOffsetIndex ?? 0;
+    const start = Math.max(0, Math.min(cursorIndex, cursorIndex + offset));
+    const end = Math.min(files.length - 1, Math.max(cursorIndex, cursorIndex + offset));
+
+    return { files, start, end };
+};
+
+const getUniquePastePath = (targetDir: string, originalName: string) => {
+    let candidateName = originalName;
+    let candidatePath = path.join(targetDir, candidateName);
+    let attempt = 1;
+
+    while (fs.existsSync(candidatePath)) {
+        const parsed = path.parse(originalName);
+        const suffix = attempt === 1 ? "copy" : `copy${attempt}`;
+        candidateName = `${parsed.name}-${suffix}${parsed.ext}`;
+        candidatePath = path.join(targetDir, candidateName);
+        attempt += 1;
+    }
+
+    return candidatePath;
 };
 
 const renderer = await createCliRenderer();
@@ -385,6 +418,68 @@ keyHandler.on("keypress", (key: KeyEvent) => {
                 ? Math.min(previousSurvivingIndex, remainingCount - 1)
                 : 0;
             (useFileStore.getState() as any).setIndex(nextIndex);
+        }
+
+        // Copy selected item(s)
+        if (key.name == "c") {
+            const fileStore = useFileStore.getState() as any;
+            const dir = fileStore.directory ?? "";
+            const { files, start, end } = getSelectionRange(fileStore);
+            const selected = files.slice(start, end + 1).filter((item: any) => !!item?.name);
+
+            if (selected.length === 0) {
+                popup("Nothing selected to copy");
+                return;
+            }
+
+            clipboardEntries = selected.map((item: any) => ({
+                sourcePath: path.join(dir, item.name),
+                name: item.name
+            }));
+            popup(`Copied ${clipboardEntries.length} item(s)`);
+        }
+
+        // Paste copied item(s) into current directory
+        if (key.name == "v") {
+            if (clipboardEntries.length === 0) {
+                popup("Clipboard is empty");
+                return;
+            }
+
+            const fileStore = useFileStore.getState() as any;
+            const targetDir = fileStore.directory ?? "";
+            let pastedCount = 0;
+            let failedCount = 0;
+
+            for (const entry of clipboardEntries) {
+                try {
+                    const destinationPath = getUniquePastePath(targetDir, entry.name);
+                    const sourceStats = fs.lstatSync(entry.sourcePath);
+
+                    if (sourceStats.isDirectory()) {
+                        fs.cpSync(entry.sourcePath, destinationPath, { recursive: true });
+                    }
+                    else {
+                        fs.copyFileSync(entry.sourcePath, destinationPath);
+                    }
+
+                    pastedCount += 1;
+                }
+                catch {
+                    failedCount += 1;
+                }
+            }
+
+            fileStore.loadFiles();
+            if (pastedCount > 0 && failedCount > 0) {
+                popup(`Pasted ${pastedCount} item(s), ${failedCount} failed`);
+            }
+            else if (pastedCount > 0) {
+                popup(`Pasted ${pastedCount} item(s)`);
+            }
+            else {
+                popup("Paste failed");
+            }
         }
     }
 });
