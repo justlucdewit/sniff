@@ -229,7 +229,7 @@ export const useInputStore = create((set) => ({
     mode: "none",
     value: '',
     setVisible: (visible: boolean) => set({ visible: visible }),
-    setMode: (mode: "none" | "prompt" | "search") => set({ mode: mode }),
+    setMode: (mode: "none" | "prompt" | "search" | "command") => set({ mode: mode }),
     setValue: (value: string) => set({ value: value }),
 }))
 

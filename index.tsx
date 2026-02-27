@@ -6,6 +6,7 @@ import { App } from './src/App'
 import settings from './src/settings'
 import { InputRenderableEvents } from "@opentui/core"
 import fs from "fs"
+import { processCommand } from "./src/CommandService"
 
 declare global {
     var popup: (message: string) => void;
@@ -62,6 +63,22 @@ keyHandler.on("keypress", (key: KeyEvent) => {
 
     // Keybinds in both menu and filelist
     if (fileListWasFocused || menuWasFocused) {
+        if ((key.name == "." || key.name == "period") && inputBar) {
+            key.preventDefault();
+            key.stopPropagation();
+            const returnTarget = menuWasFocused ? menu : fileList;
+            (useInputStore.getState() as any).setVisible(true);
+            (useInputStore.getState() as any).setMode("command");
+            (useInputStore.getState() as any).setValue(".");
+            inputBar.focus();
+            inputBar.once(InputRenderableEvents.ENTER, (commandInput: string) => {
+                (useInputStore.getState() as any).setVisible(false);
+                (useInputStore.getState() as any).setMode("none");
+                processCommand(commandInput, renderer);
+                returnTarget?.focus();
+            });
+        }
+
         // Quit app
         if (key.name == "q") {
             renderer.destroy()
