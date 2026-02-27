@@ -113,6 +113,13 @@ export const processCommand = async (input: string, renderer: CliRenderer) => {
         return;
     }
 
+    if (command === ".reload") {
+        const fileStore = useFileStore.getState() as any;
+        fileStore.loadFiles();
+        popup("Files reloaded");
+        return;
+    }
+
     if (command === ".convert") {
         await handleConvertCommand(args);
         return;
