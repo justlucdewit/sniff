@@ -1,6 +1,6 @@
 import fs from 'fs'
-import settings from "./settings"
-import { useFileStore } from "./store"
+import settings from "../../config/settings"
+import { useFileStore } from "../../state/store"
 import { useEffect, useRef } from "react"
 import os from "os"
 

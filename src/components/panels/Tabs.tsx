@@ -1,5 +1,5 @@
-import settings from "./settings"
-import { useTabsStore } from "./store";
+import settings from "../../config/settings"
+import { useTabsStore } from "../../state/store";
 
 export function Tabs() {
     const tabs = useTabsStore((state: any) => state.tabs);

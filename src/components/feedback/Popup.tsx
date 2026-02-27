@@ -1,5 +1,5 @@
-import settings from "./settings";
-import { usePopupStore } from "./store";
+import settings from "../../config/settings";
+import { usePopupStore } from "../../state/store";
 
 export function Popup() {
     const activePopup = usePopupStore((state: any) => state.activePopup) as null | { id: number, message: string };

@@ -124,7 +124,7 @@ e() {
 
 ## Editor Configuration
 The editor command is defined in:
-- `src/settings.ts`
+- `src/config/settings.ts`
 
 Current default:
 - `code`

@@ -1,6 +1,6 @@
-import { Tabs } from "./Tabs"
-import { Files } from "./Files"
-import { Inputbar } from "./Inputbar";
+import { Tabs } from "../panels/Tabs"
+import { Files } from "../panels/Files"
+import { Inputbar } from "../panels/Inputbar";
 
 export function Explorer() {
     return (

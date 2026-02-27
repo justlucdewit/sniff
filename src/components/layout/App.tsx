@@ -1,6 +1,6 @@
-import { Menu } from "./Menu"
+import { Menu } from "../panels/Menu"
 import { Explorer } from "./Explorer"
-import { Popup } from "./Popup"
+import { Popup } from "../feedback/Popup"
 
 export function App() {
     return (

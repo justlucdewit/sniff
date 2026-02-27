@@ -1,7 +1,7 @@
 import type { CliRenderer } from "@opentui/core";
 import path from "path";
 import sharp from "sharp";
-import { popup, useFileStore } from "./store";
+import { popup, useFileStore } from "../state/store";
 
 const parseCommand = (input: string) => {
     const trimmed = input.trim();

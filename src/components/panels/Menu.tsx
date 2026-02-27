@@ -1,5 +1,5 @@
-import settings from "./settings"
-import { useSideMenuStore } from "./store"
+import settings from "../../config/settings"
+import { useSideMenuStore } from "../../state/store"
 
 export function Menu() {
     const favDirs = useSideMenuStore((state: any) => state.favoriteDirectories);

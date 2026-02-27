@@ -1,5 +1,5 @@
-import settings from "./settings"
-import { useInputStore } from "./store";
+import settings from "../../config/settings"
+import { useInputStore } from "../../state/store";
 
 export function Inputbar() {
     const visible = useInputStore((state: any) => state.visible);
