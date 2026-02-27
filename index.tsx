@@ -7,6 +7,8 @@ import settings from './src/settings'
 import { InputRenderableEvents } from "@opentui/core"
 import fs from "fs"
 import { processCommand } from "./src/CommandService"
+import os from "os"
+import path from "path"
 
 declare global {
     var popup: (message: string) => void;
@@ -14,6 +16,20 @@ declare global {
 
 globalThis.popup = (message: string) => {
     popup(message, 10000);
+};
+
+const lastDirectoryFilePath = path.join(os.homedir(), ".sniff-last-dir");
+const persistLastDirectory = (dir: string) => {
+    if (!dir || typeof dir !== "string") {
+        return;
+    }
+
+    try {
+        fs.writeFileSync(lastDirectoryFilePath, `${dir}\n`, "utf-8");
+    }
+    catch {
+        // Ignore persistence errors so navigation keeps working.
+    }
 };
 
 const renderer = await createCliRenderer();
@@ -32,6 +48,16 @@ useInputStore.subscribe((state: any, prevState: any) => {
 
     (useFileStore.getState() as any).setSearchQuery(state.value, false);
     (useFileStore.getState() as any).loadFiles();
+});
+useFileStore.subscribe((state: any, prevState: any) => {
+    if (state.directory !== prevState.directory) {
+        persistLastDirectory(state.directory);
+    }
+});
+
+process.on("exit", () => {
+    const dir = (useFileStore.getState() as any).directory;
+    persistLastDirectory(dir);
 });
 
 const keyHandler = renderer.keyInput;
@@ -365,3 +391,4 @@ keyHandler.on("keypress", (key: KeyEvent) => {
 
 (useFileStore.getState() as any).setDirectory(process.cwd());
 (useFileStore.getState() as any).loadFiles();
+persistLastDirectory((useFileStore.getState() as any).directory);
