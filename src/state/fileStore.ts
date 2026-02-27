@@ -97,7 +97,7 @@ export const useFileStore = create((set) => ({
                     type = "file";
                 }
 
-                return { name, type };
+                return { name, type, size: stats.size };
             })
             .sort((a, b) => {
                 if (typePriority[a.type] !== typePriority[b.type]) {
