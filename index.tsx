@@ -1,11 +1,19 @@
 import { createCliRenderer, InputRenderable, type KeyEvent } from "@opentui/core"
 import { createRoot } from "@opentui/react"
-import { useFileStore, useInputStore, useSideMenuStore, useTabsStore } from "./src/store"
+import { popup, useFileStore, useInputStore, useSideMenuStore, useTabsStore } from "./src/store"
 import { exec } from 'child_process'
 import { App } from './src/App'
 import settings from './src/settings'
 import { InputRenderableEvents } from "@opentui/core"
 import fs from "fs"
+
+declare global {
+    var popup: (message: string) => void;
+}
+
+globalThis.popup = (message: string) => {
+    popup(message, 10000);
+};
 
 const renderer = await createCliRenderer();
 createRoot(renderer).render(<App />);
