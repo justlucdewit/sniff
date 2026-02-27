@@ -74,7 +74,7 @@ keyHandler.on("keypress", (key: KeyEvent) => {
             inputBar.once(InputRenderableEvents.ENTER, (commandInput: string) => {
                 (useInputStore.getState() as any).setVisible(false);
                 (useInputStore.getState() as any).setMode("none");
-                processCommand(commandInput, renderer);
+                void processCommand(commandInput, renderer);
                 returnTarget?.focus();
             });
         }
