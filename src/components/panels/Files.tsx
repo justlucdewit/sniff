@@ -2,6 +2,7 @@ import settings from "../../config/settings"
 import { useFileStore } from "../../state/store"
 import { useEffect, useRef } from "react"
 import os from "os"
+import path from "path"
 
 export function Files() {
     const scrollRef = useRef<any>(null);
@@ -20,11 +21,29 @@ export function Files() {
         return path;
     };
 
-    const type2iconMap = {
-        "dir": "📂",
-        "file": "📄",
-        "unknown": "?"
-    }
+    const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".tiff", ".tif", ".avif", ".heic", ".heif"]);
+    const VIDEO_EXTENSIONS = new Set([".mp4", ".mov", ".mkv", ".webm", ".avi", ".m4v", ".wmv", ".flv", ".mpg", ".mpeg"]);
+
+    const getFileIcon = (file: { name: string, type: "dir" | "file" | "unknown" }) => {
+        if (file.type === "dir") {
+            return "📂";
+        }
+
+        if (file.type === "unknown") {
+            return "?";
+        }
+
+        const extension = path.extname(file.name).toLowerCase();
+        if (IMAGE_EXTENSIONS.has(extension)) {
+            return "📷";
+        }
+
+        if (VIDEO_EXTENSIONS.has(extension)) {
+            return "🎬";
+        }
+
+        return "📄";
+    };
 
     const formatSize = (bytes: number, type: "dir" | "file" | "unknown") => {
         if (type === "dir") {
@@ -75,7 +94,7 @@ export function Files() {
                 return (
                 <box key={file.name} width="100%" height={1} flexDirection="row" justifyContent="space-between">
                     <text fg={rowColor}>
-                        {type2iconMap[file.type]} {file.name}
+                        {getFileIcon(file)} {file.name}
                     </text>
                     <text fg={rowColor}>
                         {formatSize(file.size, file.type)}
